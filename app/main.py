@@ -21,12 +21,18 @@ def parse_line(line):
         elif in_double:
             if ch == '"':
                 in_double = False
+            elif ch == '\\' and i + 1 < len(stripped) and stripped[i+1] in ['"','\\']:
+                st.append(stripped[i + 1])
+                i += 1
             else:
                 st.append(ch)
         elif ch == "'":
             in_single = True
         elif ch == '"':
             in_double = True
+        elif ch == '\\' and i + 1 < len(stripped):
+            st.append(stripped[i + 1])
+            i += 1
         elif ch == ' ':
             if st:
                 args.append(''.join(st))
