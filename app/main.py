@@ -32,7 +32,10 @@ def main():
             continue
         elif command_line.startswith("cd"):
             new_path = Path(command_line.split()[1])
-            if new_path.exists() and new_path.is_dir():
+            home_path = os.environ.get("HOME")
+            if new_path.name =="~":
+                os.chdir(home_path)
+            elif new_path.exists() and new_path.is_dir():
                 os.chdir(new_path)
             else:
                 print(f"cd: {new_path}: No such file or directory")
