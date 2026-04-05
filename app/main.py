@@ -26,10 +26,14 @@ def main():
             to_print = command_line.split("echo ")[1]
             print(to_print)
             continue
+        elif command_line.startswith("pwd") and len(command_line.split())==1:
+            current = Path(os.getcwd())
+            print(f"{current}")
+            continue
         elif command_line.startswith("type"):
             command = command_line.split()[1]
             exec_path = check_exec(command)
-            if command in ["type", "echo", "exit"]:
+            if command in ["type", "echo", "exit", "pwd"]:
                 print(f"{command} is a shell builtin")
             elif exec_path:
                 print(f"{command} is {exec_path}")
