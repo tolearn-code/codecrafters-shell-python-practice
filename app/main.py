@@ -1,6 +1,7 @@
 import sys
 import os
 from pathlib import Path
+import subprocess
 
 def check_exec(command):
     paths = os.environ.get("PATH")
@@ -36,7 +37,12 @@ def main():
                 print(f"{command}: not found")
             continue
         else:    
-            print(f"{command_line}: command not found")
+            args = command_line.split()
+            exec_path = check_exec(args[0])
+            if exec_path:
+                subprocess.run(args)
+            else:
+                print(f"{args[0]}: command not found")
             
     
     
