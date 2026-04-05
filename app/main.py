@@ -1,6 +1,19 @@
 import sys
+import os
+from pathlib import Path
 
-
+def check_exec(command):
+    paths = os.environ.get("PATH")
+    paths = paths.split(":")
+    for p in paths:
+        current_path = Path(p)
+        if current_path.exists() and current_path.is_dir():
+            files = current_path.iterdir()
+            for f in files:
+                file_path = current_path / f
+                if f.name == command and os.access(file_path,os.X_OK):
+                    return file_path
+    return False
 def main():
     while True:
         sys.stdout.write("$ ")
@@ -14,13 +27,17 @@ def main():
             continue
         elif command_line.startswith("type"):
             command = command_line.split()[1]
+            exec_path = check_exec(command)
             if command in ["type", "echo", "exit"]:
                 print(f"{command} is a shell builtin")
+            elif exec_path:
+                print(f"{command} is {exec_path}")
             else:
                 print(f"{command}: not found")
             continue
-        
-        print(f"{command_line}: command not found")
+        else:    
+            print(f"{command_line}: command not found")
+            
     
     
 
