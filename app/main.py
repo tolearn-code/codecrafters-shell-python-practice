@@ -7,16 +7,33 @@ import subprocess
 def parse_line(line):
     args = []
     st = []
-    in_quotes = False
-    for ch in line.strip():
-        if ch == "'":
-            in_quotes = not in_quotes
-        elif ch == ' ' and not in_quotes:
+    in_single = False
+    in_double = False
+    i = 0
+    stripped = line.strip()
+    while i < len(stripped):
+        ch = stripped[i]
+        if in_single:
+            if ch == "'":
+                in_single = False
+            else:
+                st.append(ch)
+        elif in_double:
+            if ch == '"':
+                in_double = False
+            else:
+                st.append(ch)
+        elif ch == "'":
+            in_single = True
+        elif ch == '"':
+            in_double = True
+        elif ch == ' ':
             if st:
                 args.append(''.join(st))
                 st = []
         else:
             st.append(ch)
+        i += 1
     if st:
         args.append(''.join(st))
     return args
