@@ -3,6 +3,24 @@ import os
 from pathlib import Path
 import subprocess
 
+
+def parse_line(line):
+    args = []
+    st = []
+    in_quotes = False
+    for ch in line.strip():
+        if ch == "'":
+            in_quotes = not in_quotes
+        elif ch == ' ' and not in_quotes:
+            if st:
+                args.append(''.join(st))
+                st = []
+        else:
+            st.append(ch)
+    if st:
+        args.append(''.join(st))
+    return args
+
 def check_exec(command):
     paths = os.environ.get("PATH")
     paths = paths.split(":")
@@ -15,23 +33,25 @@ def check_exec(command):
                 if f.name == command and os.access(file_path,os.X_OK):
                     return file_path
     return False
+
+
 def main():
     while True:
         sys.stdout.write("$ ")
         command_line = input()
         command_line = command_line.strip()
+        args = parse_line(command_line)
         if command_line.startswith("exit"):
             sys.exit(0)
         elif command_line.startswith("echo"):
-            to_print = command_line.split("echo ")[1]
-            print(to_print)
+            print(' '.join(args[1:]))
             continue
         elif command_line.startswith("pwd") and len(command_line.split())==1:
             current = Path(os.getcwd())
             print(f"{current}")
             continue
         elif command_line.startswith("cd"):
-            new_path = Path(command_line.split()[1])
+            new_path = Path(args[1])
             home_path = os.environ.get("HOME")
             if new_path.name =="~":
                 os.chdir(home_path)
@@ -39,9 +59,8 @@ def main():
                 os.chdir(new_path)
             else:
                 print(f"cd: {new_path}: No such file or directory")
-        
         elif command_line.startswith("type"):
-            command = command_line.split()[1]
+            command = args[1]
             exec_path = check_exec(command)
             if command in ["type", "echo", "exit", "pwd"]:
                 print(f"{command} is a shell builtin")
@@ -50,8 +69,7 @@ def main():
             else:
                 print(f"{command}: not found")
             continue
-        else:    
-            args = command_line.split()
+        else:
             exec_path = check_exec(args[0])
             if exec_path:
                 subprocess.run(args)
