@@ -30,6 +30,13 @@ def main():
             current = Path(os.getcwd())
             print(f"{current}")
             continue
+        elif command_line.startswith("cd"):
+            new_path = Path(command_line.split()[1])
+            if new_path.exists() and new_path.is_dir():
+                os.chdir(new_path)
+            else:
+                print(f"cd: {new_path}: No such file or directory")
+        
         elif command_line.startswith("type"):
             command = command_line.split()[1]
             exec_path = check_exec(command)
